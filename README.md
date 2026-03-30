@@ -53,3 +53,48 @@ AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
 SQS_QUEUE_URL=sqs_url
 SNS_TOPIC_ARN=sns_topic
+```
+
+
+### 3. Database Initialization
+
+The application automatically handles MySQL table migration on startup. For DynamoDB, ensure a table named Tasks exists with id (Number) as the Partition Key.
+
+
+### 4. Installation & Execution
+
+Bash
+Clone the repository
+git clone [https://github.com/saurabh2836/rust-microservice.git](https://github.com/saurabh2836/rust-microservice.git)
+
+# Build and run
+cargo run
+📡 API Endpoints
+Method	Endpoint	Description
+GET	/tasks	Fetches all tasks from MySQL.
+POST	/tasks	Syncs task to MySQL, Dynamo, Mongo, Redis, SQS, and SNS.
+PUT	/tasks/{id}	Updates task title/status in MySQL.
+DELETE	/tasks/{id}	Removes task from MySQL.
+🛡️ Security Best Practices
+Secret Scanning: This project is protected by GitHub Secret Scanning.
+
+.gitignore: Ensure .env is never committed to the repository.
+
+
+### Permissions Boundary: If using a managed AWS account, ensure your IAM user has a permissions boundary that allows sqs:SendMessage and sns:Publish.
+
+
+### 🧠 Logic Flow in create_task
+**Validation**: Deserialize incoming JSON into a Task struct.
+
+**Persistence**: Insert into MySQL using SeaQuery's MysqlQueryBuilder.
+
+**Cloud Mapping**: Convert Rust types to DynamoDB Attributes via serde_dynamo.
+
+**Async Queue**: Stringify the task and push to SQS for downstream processing.
+
+**Broadcasting**: Trigger an SNS event to notify subscribed services.
+
+**Logging**: Sync the operation to Redis and insert an audit document into MongoDB.
+
+**Developed** with 🦀 by Saurabh Kamble
